@@ -1,10 +1,9 @@
 package com.example.server;
 
+import com.example.server.config.ChannelList;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.string.StringDecoder;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -17,6 +16,7 @@ public class NettyServerHandler extends StringDecoder {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Server,channelActive");
+        ChannelList.getInstance().add(ctx.channel());
     }
 
     @Override
@@ -34,10 +34,6 @@ public class NettyServerHandler extends StringDecoder {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Server,channelInactive");
-    }
-
-    @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        super.decode(ctx, msg, out);
+        ChannelList.getInstance().remove(ctx.channel());
     }
 }

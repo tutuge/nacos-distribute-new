@@ -1,17 +1,26 @@
 package com.example.customer;
 
+import com.example.customer.config.GlobalNettyExceptionHandler;
+import com.example.customer.config.TextMessageDecoder;
+import com.example.customer.config.TextMessageEncoder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import jdk.nashorn.internal.runtime.linker.Bootstrap;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.nio.channels.SocketChannel;
 
 public class NettyClient {
     private String mHost;
 
     private int mPort;
 
-    private NettyClientHandler mClientHandler;
+    private NettyClientHandler mClientHandler = new NettyClientHandler();
+    private final TextMessageDecoder textMessageDecoder =new TextMessageDecoder();
+    private final TextMessageEncoder textMessageEncoder =new TextMessageEncoder();
 
     private ChannelFuture mChannelFuture;
 
@@ -24,7 +33,6 @@ public class NettyClient {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
-            mClientHandler = new NettyClientHandler();
             b.group(workerGroup).channel(NioSocketChannel.class)
                     // KeepAlive
                     .option(ChannelOption.SO_KEEPALIVE, true)
@@ -32,13 +40,18 @@ public class NettyClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
 
                         @Override
-                        protected void initChannel(SocketChannel channel) throws Exception {
-                            channel.pipeline().addLast(mClientHandler);
+                        protected void initChannel(SocketChannel ch) throws Exception {
+
+                            ch.pipeline().addLast(textMessageDecoder);
+                            ch.pipeline().addLast(textMessageEncoder);
+                            ch.pipeline().addLast(mClientHandler);
+                            //全局异常处理器
+                            ch.pipeline().addLast(new GlobalNettyExceptionHandler());
                         }
                     });
             mChannelFuture = b.connect(mHost, mPort).sync();
             if (mChannelFuture.isSuccess()) {
-                LogUtil.log("Client,连接服务端成功");
+                System.out.println("Client,连接服务端成功");
             }
             mChannelFuture.channel().closeFuture().sync();
         } catch (Exception e) {

@@ -1,6 +1,8 @@
 package com.example.server;
 
+import com.example.server.config.GlobalNettyExceptionHandler;
 import com.example.server.config.TextMessageDecoder;
+import com.example.server.config.TextMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -19,6 +21,7 @@ public class NettyServer {
     private final EventLoopGroup workerGroup;
     private final NettyServerHandler nettyServerHandler = new NettyServerHandler();
     private final TextMessageDecoder textMessageDecoder =new TextMessageDecoder();
+    private final TextMessageEncoder textMessageEncoder =new TextMessageEncoder();
 
     public NettyServer(int port, EventLoopGroup bossGroup, EventLoopGroup workerGroup) {
         this.mPort = port;
@@ -52,10 +55,11 @@ public class NettyServer {
                              * 2. 这就就是为什么，当浏览器发送大量数据时，就会发出多次http请求
                              */
 //                            ch.pipeline().addLast(new HttpObjectAggregator(4 * 1024));
-                            ch.pipeline().addLast(textMessageDecoder);
+                            ch.pipeline().addLast(new TextMessageEncoder());
+                            ch.pipeline().addLast(new TextMessageDecoder());
                             ch.pipeline().addLast(nettyServerHandler);
-
-
+                            //全局异常处理器
+                            ch.pipeline().addLast(new GlobalNettyExceptionHandler());
                         }
                     });
             ChannelFuture f = b.bind(mPort).sync();
