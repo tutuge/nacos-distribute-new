@@ -12,6 +12,6 @@ public class CustomerApplication {
 
     public static void main(String[] args) {
         NettyClient nettyClient = new NettyClient("127.0.0.1",12345);
-        nettyClient.connect();
+        nettyClient.start();
     }
 }

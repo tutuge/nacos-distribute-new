@@ -51,10 +51,10 @@ public class ServerApplication {
                     throw new RuntimeException(e);
                 }
                 ChannelList instance = ChannelList.getInstance();
+                Random random = new Random();
+                int i = random.nextInt(1000);
                 instance.forEach((k, v) -> {
                     System.out.println("当前的channel名称：" + k);
-                    Random random = new Random();
-                    int i = random.nextInt(1000);
                     System.out.println("当前要发送的消息" + i);
                     System.out.println("当前channel" + v);
                     v.writeAndFlush(String.valueOf(i));
