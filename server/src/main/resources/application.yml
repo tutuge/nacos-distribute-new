@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: demo123
+    #非web的方式运行
+  main:
+    web-application-type: none
+  cloud:
+    nacos:
+      server-addr: ${nacos_address:127.0.0.1:8848}
+      config:
+        server-addr: ${nacos_address:127.0.0.1:8848}
+        namespace: ${nacos_namespace:go}
+        file-extension: yaml
+      discovery:
+        server-addr: ${nacos_address:127.0.0.1:8848}
+        namespace: ${nacos_namespace:go}
+  config:
+    import:
+      - optional:nacos:application-common.yml
+      - optional:nacos:${spring.application.name}.yml
+
+server:
+  port: 8085

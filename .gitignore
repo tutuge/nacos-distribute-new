@@ -27,3 +27,6 @@ hs_err_pid*
 /HELP.md
 /mvnw
 /mvnw.cmd
+/customer/.mvn/
+/server/.mvn/wrapper/maven-wrapper.jar
+/server/.mvn/wrapper/maven-wrapper.properties
